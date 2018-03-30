@@ -1,14 +1,31 @@
 var express = require('express');
 var router = express.Router();
+var Country = require('../models/country');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-    res.render('index', { title: 'Express1' });
+    res.render('index', { title: 'Express' });
 });
+
 
 /* GET countries page. */
 router.get('/countries', function(req, res, next) {
-    let countries = [{
+   Country.find(function(err, countries) {
+        if (err) return console.err(err);
+        res.render('countries', { title: 'Країни', countries: countries });
+    });
+
+    /* Country.find()
+         .then(function(countries) {
+             res.render('countries', { title: 'Express2', countries: countries });
+         })
+         .catch(next)
+         .error(console.error);*/
+});
+
+router.get("/setup-db", function(req, res) {
+
+    var countries = [{
             Name: "Египет",
             Desc: "Ежегодно страну посещают 10 млн. туристов. Открыт Египет для путешественников круглый год, но лучшим сезоном для пляжного отдыха и экскурсий считаются весна и осень. Древняя цивилизация оставила на территории государства тысячи достопримечательностей. Здесь расположены пирамиды Гизы, Долина царей, храмы Луксора и Сфинкс. В список ЮНЕСКО занесены раннехристианские памятники Абу-Мена (III-IV столетие), памятники Нубии (XIII столетий до нашей эры), монастырь Святой Екатерины (VI век), Вади-аль-Хитан (2005 год), а также вся старая часть столицы Каира. Популярность также набирают круизы по Нилу.",
             Image: "https://img.poehalisnami.ua/Data/cImg/CountryImage11.jpg"
@@ -39,17 +56,32 @@ router.get('/countries', function(req, res, next) {
             Image: "https://img.poehalisnami.ua/Data/cImg/CountryImage75.jpg"
         }
     ];
-    res.render('countries', { title: 'Express2', countries: countries });
-});
 
+    Country.remove({}, function(err) {
+        if (err) {
+            console.error(err);
+        } else {
+
+            for (let i = 0; i < countries.length; i++) {
+                Country.create(countries[i], function(err, country) {
+                    if (err) console.error('Error: ' + err);
+                    else console.log();
+                });
+            }
+        }
+    });
+    res.status(200).json({
+        message: "Okey",
+    });
+
+});
 /* GET prices page. */
 router.get('/prices', function(req, res, next) {
-    res.render('prices', { title: 'Express3' });
+    res.render('prices', { title: 'Prices' });
 });
-
 /* GET contacts page. */
 router.get('/contacts', function(req, res, next) {
-    res.render('contacts', { title: 'Express4' });
+    res.render('contacts', { title: 'Contacts' });
 });
 
 module.exports = router;
